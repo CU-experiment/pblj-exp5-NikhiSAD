@@ -1,0 +1,122 @@
+import java.io.*;
+import java.util.*;
+
+class Employee implements Serializable {
+    private String name;
+    private int id;
+    private String designation;
+    private double salary;
+
+    // Constructor to initialize employee details
+    public Employee(String name, int id, String designation, double salary) {
+        this.name = name;
+        this.id = id;
+        this.designation = designation;
+        this.salary = salary;
+    }
+
+    // Getter methods
+    public String getName() {
+        return name;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getDesignation() {
+        return designation;
+    }
+
+    public double getSalary() {
+        return salary;
+    }
+
+    // toString method to display employee details
+    @Override
+    public String toString() {
+        return "ID: " + id + ", Name: " + name + ", Designation: " + designation + ", Salary: " + salary;
+    }
+}
+
+public class EmployeeApp {
+
+    private static final String FILE_NAME = "employees.ser";
+
+    // Method to add an employee and save it to a file
+    public static void addEmployee() {
+        Scanner scanner = new Scanner(System.in);
+
+        // Gather employee details from the user
+        System.out.print("Enter Employee Name: ");
+        String name = scanner.nextLine();
+
+        System.out.print("Enter Employee ID: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();  // Consume newline left-over
+
+        System.out.print("Enter Employee Designation: ");
+        String designation = scanner.nextLine();
+
+        System.out.print("Enter Employee Salary: ");
+        double salary = scanner.nextDouble();
+
+        // Create a new Employee object
+        Employee employee = new Employee(name, id, designation, salary);
+
+        // Serialize the employee object and store it in the file
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(FILE_NAME, true))) {
+            out.writeObject(employee);
+            System.out.println("Employee added successfully!");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Method to display all employees from the file
+    public static void displayAllEmployees() {
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
+            System.out.println("Employee List:");
+            while (true) {
+                Employee employee = (Employee) in.readObject();
+                System.out.println(employee);
+            }
+        } catch (EOFException e) {
+            // End of file reached
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Method to display the menu and handle user input
+    public static void displayMenu() {
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\nMenu:");
+            System.out.println("1. Add Employee");
+            System.out.println("2. Display All Employees");
+            System.out.println("3. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    addEmployee(); // Add employee to the file
+                    break;
+                case 2:
+                    displayAllEmployees(); // Display all employees
+                    break;
+                case 3:
+                    System.out.println("Exiting application...");
+                    return; // Exit the application
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        displayMenu(); // Display the menu and start the application
+    }
+}
